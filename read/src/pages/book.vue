@@ -32,14 +32,14 @@
                 <!-- 小说标题 -->
                 <view :style="{ 
                     fontSize: AppOption.sizeInfo.title + 'px', 
-                    LineHeight: AppOption.sizeInfo.tineHeight + 'px', 
+                    lineHeight: AppOption.sizeInfo.tineHeight + 'px', 
                     marginBottom: AppOption.sizeInfo.margin +'px', 
                 }" v-show="pageTextList[index].title">{{ pageTextList[index].title }}</view>
 
                 <!-- 小说段落 -->
                 <view :style="{ 
                     fontSize: AppOption.sizeInfo.p + 'px', 
-                    LineHeight: AppOption.sizeInfo.pLineHeight + 'px', 
+                    lineHeight: AppOption.sizeInfo.pLineHeight + 'px', 
                     marginBottom: AppOption.sizeInfo.margin +'px',
                     textIndent: '24px'
                 }" v-for="(p, pIndex) in pageTextList[index].content" :key="pIndex">{{ p }}</view>
@@ -116,6 +116,8 @@ export default {
             pageWidth: 0,
             /** 页面高度 */
             pageHeight: 0,
+            /** 状态栏高度 */
+            statusBarHeight: 0,
             /** 
              * 页面切换索引 `[0,1,2]` 因为初始是中间的显示内容，所以初始值为`1`
             */
@@ -228,6 +230,7 @@ export default {
         initPageInfo() {
             this.pageWidth = uni.getSystemInfoSync().windowWidth;
             this.pageHeight = uni.getSystemInfoSync().windowHeight;
+            this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight;
             this.pageSlideValue = -(this.pageWidth + 5);
             this.styles[0].transform = `${this.pageSlideValue}px`;
             // 获取数据
@@ -525,8 +528,10 @@ export default {
                 list.push(item);
                 height += itemHeight;
                 
-                // 46是 .info + .page padding的上下距离 
-                if (height - margin > this.pageHeight - 46) {
+                /**
+                 * 56是 .info + .page padding的上下距离 
+                 */
+                if (height - margin > this.pageHeight - 56 - this.statusBarHeight) {
                     list.pop();
                     nextPageText.height = itemHeight;
                     nextPageText.text = item;
@@ -666,7 +671,7 @@ export default {
 /* 内容容器 */
 .content{ width: 100%; height: 100%; position: relative; }
 .content .page{ width: 100%; height: 100%; padding: 8px 16px; box-sizing: border-box; box-shadow: 0 5px 10px rgba(0,0,0,0.5); position: absolute; top: 0; left: 0; overflow: hidden; }
-.content .info{ width: 100%; height: 30px; display: flex; flex-wrap: wrap; align-items: center; }
+.content .info{ width: 100%; height: 30px; margin-bottom: 10px; display: flex; flex-wrap: wrap; align-items: center; }
 .content .info .name{ font-size: 30rpx; flex: 1; }
 .content .info .integral{ padding: 0 40rpx; background-color: rgba(0, 0, 0, 0.05); line-height: 40rpx; border-radius: 20rpx; position: relative; }
 .content .info .integral .text{ font-size: 28rpx; font-weight: bold; }
