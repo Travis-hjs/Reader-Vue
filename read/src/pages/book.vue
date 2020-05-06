@@ -93,7 +93,8 @@ import Global from '../modules/Global';
 import BookTip from '../components/BookTip';
 import utils from '../modules/utils';
 import {
-    createBookContent
+    createBookContent,
+    paragraphSeparate
 } from '../modules/createdata';
 
 /** 页面过渡时间（毫秒） */
@@ -476,7 +477,7 @@ export default {
         */
         updateChapterList(chapter, data) {
             /** 当前章节的段落列表 */
-            const contents = data.content.split('<br />');
+            const contents = data.content.split(paragraphSeparate);
             /** 下边距 */
             const margin = this.AppOption.sizeInfo.margin;
             /** 内容实际宽度 */

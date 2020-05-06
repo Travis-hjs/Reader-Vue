@@ -41,6 +41,9 @@ export function createBookListData(index = 0, total = 8) {
     return list;
 }
 
+/** 段落分隔符 */
+export const paragraphSeparate = '<br /><br />';
+
 /** 
  * 创建阅读器内容信息（一个章节） 
  * @param {number} index 
@@ -52,7 +55,7 @@ export function createBookContent(index) {
         for (let i = 0; i < total; i++) {
             text +=  utils.randomText(2, 10);
             if (i == total - 1) {
-                text += '。<br />';
+                text += '。' + paragraphSeparate;
             } else {
                 text += '，';
             }
