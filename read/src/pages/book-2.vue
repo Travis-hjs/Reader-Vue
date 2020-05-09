@@ -26,8 +26,6 @@
                         <view class="icon">$</view>
                     </view>
                 </view>
-
-                <!-- <view style="text-align: end;">pageIndex: {{ pageIndex }} z-index: {{ styles[index].zIndex }}</view> -->
                 
                 <!-- 小说标题 -->
                 <view :style="{ 
@@ -119,10 +117,6 @@ export default {
             pageHeight: 0,
             /** 状态栏高度 */
             statusBarHeight: 0,
-            /** 
-             * 页面切换索引 `[0,1,2]` 因为初始是中间的显示内容，所以初始值为`1`
-            */
-            pageIndex: 1,
             /** 页面负偏移量（负数） */
             pageSlideValue: 0,
             /** 触摸位置 */
@@ -131,6 +125,10 @@ export default {
             touchTime: 0,
             /** 首次打开提示 */
             firstTip: false,
+            /** 滑动计时器 */
+            slideTimer: null,
+            /** 是否开始触摸 */
+            startTouch: false,
 
             styles: [
                 {
@@ -209,6 +207,11 @@ export default {
         }
         this.initPageInfo();
     },
+    onUnload() {
+        if (this.slideTimer !== null) {
+            clearTimeout(this.slideTimer);
+        }
+    },
     methods: {
         /** 关闭新手提示 */
         closeBookTip() {
@@ -240,96 +243,90 @@ export default {
                 this.updateContent();
             });
         },
+        /** 重置页面（位置偏移） */
+        resetPage() {
+            this.styles[0].transition = '0s all';
+            this.styles[0].transform = `${this.pageSlideValue}px`;
+
+            this.styles[1].transition = '0s all';
+            this.styles[1].transform = '0px';
+
+            this.styles[2].transition = '0s all';
+            this.styles[2].transform = '0px';
+        },
         /** 切换到上一页 */
         pagePrev() {
-            this.pageIndex --;
-            if (this.pageIndex < 0) this.pageIndex = 2;
+            this.styles[0].transition = `${slideTime}ms all`;
+            this.styles[0].transform = '0px';
 
-            let lastIndex = this.pageIndex - 1;
-            if (lastIndex < 0) lastIndex = 2;
-            this.styles[lastIndex].transition = '0s all';
-            this.styles[lastIndex].transform = `${this.pageSlideValue}px`;
-            this.styles[lastIndex].zIndex = '3';
+            this.styles[1].transition = '0s all';
+            this.styles[1].transform = '0px';
 
-            let nextIndex = lastIndex - 1;
-            if (nextIndex < 0) nextIndex = 2;
-            this.styles[nextIndex].transition = '0s all';
-            this.styles[nextIndex].transform = '0px';
-            this.styles[nextIndex].zIndex = '1';
+            this.styles[2].transition = '0s all';
+            this.styles[2].transform = '0px';
 
-            this.styles[this.pageIndex].transition = `${slideTime}ms all`;
-            this.styles[this.pageIndex].transform = '0px';
-            this.styles[this.pageIndex].zIndex = '2';
-            
-            if (this.chapterPage > 0) {
-                this.chapterPage --;
+            this.slideTimer = setTimeout(() => {
+                if (this.chapterPage > 0) {
+                    this.chapterPage --;
+                } else {
+                    this.chapterIndex --;
+                    this.chapterPage = this.chapterList[this.chapterIndex].length - 1;
+                }
                 this.updateContent();
-            } else {
-                this.chapterIndex --;
-                this.chapterPage = this.chapterList[this.chapterIndex].length - 1;
-            }
+                this.resetPage();
+                clearTimeout(this.slideTimer);
+                this.slideTimer = null;
+            }, slideTime);
         },
         /** 切换到下一页 */
         pageNext() {
-            const currentIndex = this.pageIndex;
-            this.styles[currentIndex].transition = `${slideTime}ms all`;
-            this.styles[currentIndex].transform = `${this.pageSlideValue}px`;
-            this.styles[currentIndex].zIndex = '3';
+            this.styles[0].transition = '0s all';
+            this.styles[0].transform = `${this.pageSlideValue}px`;
 
-            let nextIndex = currentIndex + 1;
-            if (nextIndex > 2) nextIndex = 0;
-            this.styles[nextIndex].transition = `${slideTime}ms all`;
-            this.styles[nextIndex].transform = '0px';
-            this.styles[nextIndex].zIndex = '2';
+            this.styles[1].transition = `${slideTime}ms all`;
+            this.styles[1].transform = `${this.pageSlideValue}px`;
 
-            let lastIndex = nextIndex + 1;
-            if (lastIndex > 2) lastIndex = 0;
-            this.styles[lastIndex].transition = '0s all';
-            this.styles[lastIndex].transform = '0px';
-            this.styles[lastIndex].zIndex = '1';
+            this.styles[2].transition = '0s all';
+            this.styles[2].transform = '0px';
 
-            this.pageIndex ++;
-            if (this.pageIndex > 2) this.pageIndex = 0;
-
-            // console.log('执行', currentIndex);
-
-            // setTimeout(() => {
-            //     this.styles[this.pageIndex].zIndex = '3';
-            //     this.styles[nextIndex].zIndex = '2';
-            //     this.styles[lastIndex].zIndex = '1';
-            // }, slideTime);
-
-
-            if (this.chapterPage == this.chapterList[this.chapterIndex].length - 1) {
-                this.chapterIndex++;
-                this.chapterPage = 0;
-            } else {
-                this.chapterPage ++;
+            this.slideTimer = setTimeout(() => {
+                if (this.chapterPage == this.chapterList[this.chapterIndex].length - 1) {
+                    this.chapterIndex ++;
+                    this.chapterPage = 0;
+                } else {
+                    this.chapterPage ++;
+                }
                 this.updateContent();
-            }
+                this.resetPage();
+                clearTimeout(this.slideTimer);
+                this.slideTimer = null;
+            }, slideTime);
         },
         onTouchStart(e) {
             // console.log(e);
+            if (this.slideTimer !== null) return;
+            this.startTouch = true;
             const pageX = e.touches[0].pageX;
             this.touchPosition = pageX;
             this.touchTime = Date.now();
         },
         onTouchMove(e) {
+            if (!this.startTouch) return;
             if (this.showMenu) return;
             const pageX = e.touches[0].pageX;
             const slide = pageX - this.touchPosition;
-            let lastIndex = this.pageIndex - 1;
-            if (lastIndex < 0) lastIndex = 2; 
             if (slide < 0) {
-                this.styles[this.pageIndex].transition = '0s all';
-                this.styles[this.pageIndex].transform = `${slide}px`;
+                this.styles[1].transition = '0s all';
+                this.styles[1].transform = `${slide}px`;
             } else {
-                this.styles[lastIndex].transition = '0s all';
-                this.styles[lastIndex].transform = `${this.pageSlideValue + slide}px`;
+                this.styles[0].transition = '0s all';
+                this.styles[0].transform = `${this.pageSlideValue + slide}px`;
             }
             // console.log('onTouchMove', slide);
         },
         onTouchEnd(e) {
+            if (!this.startTouch) return;
+            this.startTouch = false;
             if (this.showMenu) return this.showMenu = false;
             const pageX = e.changedTouches[0].pageX;
             const now = Date.now();
@@ -337,12 +334,10 @@ export default {
             const value = this.pageWidth / 3;
             /** 返回原来位置 */
             const backPosition = () => {
-                let lastIndex = this.pageIndex - 1;
-                if (lastIndex < 0) lastIndex = 2; 
-                this.styles[lastIndex].transition = `${slideTime}ms all`;
-                this.styles[lastIndex].transform = `${this.pageSlideValue}px`;
-                this.styles[this.pageIndex].transition = `${slideTime}ms all`;
-                this.styles[this.pageIndex].transform = '0px';
+                this.styles[0].transition = `${slideTime}ms all`;
+                this.styles[0].transform = `${this.pageSlideValue}px`;
+                this.styles[1].transition = `${slideTime}ms all`;
+                this.styles[1].transform = '0px';
             }
             // console.log('onTouchEnd', slideX);
             if (Math.abs(slideX) <= 0) {
@@ -391,27 +386,6 @@ export default {
                 }
             }
         },
-
-        // /** 点击切换（旧版） */
-        // contentClick(e) {
-        //     // console.log(e);
-        //     const pageX = e.touches[0].pageX;
-        //     if (this.showMenu) {
-        //         this.showMenu = false;
-        //     } else {
-        //         const value = this.pageWidth / 3;
-        //         if (pageX < value) {
-        //             // console.log('点击左边');
-        //             this.pagePrev();
-        //         } else if (pageX > value * 2) {
-        //             // console.log('点击右边');
-        //             this.pageNext();
-        //         } else {
-        //             // console.log('点击中间');
-        //             this.showMenu = true;
-        //         }
-        //     }
-        // },
 
         /** 上一章 */
         chapterPrev() {
@@ -563,12 +537,10 @@ export default {
                 this.chapterPage = contents.length - 1;
             }
 
-            // 上一页显示的内容
-            let lastIndex = this.pageIndex - 1;
-            if (lastIndex < 0) lastIndex = 2;
+            // 上一页显示的内容 =====================================================================
             if (this.isFirstPage()) {
-                this.pageTextList[lastIndex].title = '';
-                this.pageTextList[lastIndex].content = '';
+                this.pageTextList[0].title = '';
+                this.pageTextList[0].content = '';
             } else if (this.chapterPage == 0) {
                 // 写到这里...判断加载上一章的篇章
                 /** 上一章 */
@@ -578,25 +550,23 @@ export default {
                     this.updateChapterList(prevChapter, res);
                     /** 最后一页 */
                     const lastPage = this.chapterList[prevChapter].length - 1;
-                    this.pageTextList[lastIndex].title = this.chapterList[prevChapter][lastPage].title;
-                    this.pageTextList[lastIndex].content = this.chapterList[prevChapter][lastPage].content;
+                    this.pageTextList[0].title = this.chapterList[prevChapter][lastPage].title;
+                    this.pageTextList[0].content = this.chapterList[prevChapter][lastPage].content;
                 });
             } else {
-                this.pageTextList[lastIndex].title = contents[this.chapterPage - 1].title;
-                this.pageTextList[lastIndex].content = contents[this.chapterPage - 1].content;
+                this.pageTextList[0].title = contents[this.chapterPage - 1].title;
+                this.pageTextList[0].content = contents[this.chapterPage - 1].content;
             }
 
-            // 当前显示的内容
-            this.pageTextList[this.pageIndex].title = contents[this.chapterPage].title;
-            this.pageTextList[this.pageIndex].content = contents[this.chapterPage].content;
+            // 当前显示的内容 =====================================================================
+            this.pageTextList[1].title = contents[this.chapterPage].title;
+            this.pageTextList[1].content = contents[this.chapterPage].content;
 
-            // 下一页显示的内容
-            let nextIndex = this.pageIndex + 1;
-            if (nextIndex > 2) nextIndex = 0;
+            // 下一页显示的内容 =====================================================================
             if (this.isLastPage()) {
                 // 最后一章最后一页
-                this.pageTextList[nextIndex].title = '';
-                this.pageTextList[nextIndex].content = '';
+                this.pageTextList[2].title = '';
+                this.pageTextList[2].content = '';
             } else if (this.chapterPage == contents.length - 1) {
                 // console.log('当前章数', this.chapterPage, '总列表', this.chapterList);
                 /** 下一章索引 */
@@ -604,12 +574,12 @@ export default {
                 // 加载下一章
                 this.getChapterData(nextChapter, res => {
                     this.updateChapterList(nextChapter, res);
-                    this.pageTextList[nextIndex].title = this.chapterList[nextChapter][0].title;
-                    this.pageTextList[nextIndex].content = this.chapterList[nextChapter][0].content;
+                    this.pageTextList[2].title = this.chapterList[nextChapter][0].title;
+                    this.pageTextList[2].content = this.chapterList[nextChapter][0].content;
                 });
             } else {
-                this.pageTextList[nextIndex].title = contents[this.chapterPage + 1].title;
-                this.pageTextList[nextIndex].content = contents[this.chapterPage + 1].content;
+                this.pageTextList[2].title = contents[this.chapterPage + 1].title;
+                this.pageTextList[2].content = contents[this.chapterPage + 1].content;
             }
 
         },
