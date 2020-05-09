@@ -17,6 +17,12 @@
             "style": {
                 "navigationStyle": "custom"
             }
+        },
+        {
+            "path": "pages/book-2",
+            "style": {
+                "navigationStyle": "custom"
+            }
         }
 	],
 	"globalStyle": {

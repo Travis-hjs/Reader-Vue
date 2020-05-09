@@ -45,26 +45,28 @@
 </template>
 
 <script>
+import {
+    createBookInfo
+} from '../modules/createdata';
+
 export default {
     props: {
         bookType: {
             type: String,
             default: '0'
         },
+        /**
+         * @type {createBookInfo()}
+         */
         bookData: {
             type: Object,
             default() {
-                return {    
-                    index: 0,
-                    thumb: '',
-                    info: '',
-                    name: '',
-                    id: '',
-                    score: '',
-                    label: '',
-                    value: ''
-                }
+                return createBookInfo();
             }
+        },
+        openType: {
+            type: String,
+            default: '1'
         }
     },
     data() {
@@ -81,9 +83,15 @@ export default {
                 title: `小说id: ${this.bookData.id}`,
                 icon: 'none'
             });
-            uni.navigateTo({
-                url: '/pages/book?id=' + this.bookData.id
-            });
+            if (this.openType == '2') {
+                uni.navigateTo({
+                    url: '/pages/book-2?id=' + this.bookData.id
+                });
+            } else {
+                uni.navigateTo({
+                    url: '/pages/book?id=' + this.bookData.id
+                });
+            }
         }
     }
 }

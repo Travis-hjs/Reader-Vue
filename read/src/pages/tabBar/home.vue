@@ -1,7 +1,7 @@
 <template>
     <view class="page home">
         <view class="list-item" v-for="item in list" :key="item.id">
-            <book-item book-type="1" :book-data="item" />
+            <book-item book-type="1" :book-data="item" openType="2" />
         </view>
     </view>    
 </template>

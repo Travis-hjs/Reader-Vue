@@ -10,6 +10,26 @@ const images = ['/static/book_1.jpg',
 '/static/book_4.jpg',
 '/static/book_5.jpg'];
 
+export function createBookInfo() {
+    const data = {
+        id: 0,
+        index: 0,
+        /** 封面图 */
+        thumb: '',
+        /** 小说名 */
+        name: '',
+        /** 描述 */
+        info: '',
+        /** 评分 */
+        score: '',
+        /** 标签 */
+        label: '',
+        /** 小说热度 */
+        value: '',
+    }
+    return data;
+}
+
 /**
  * 创建小说列表数据
  * @param {number} index 索引开始
@@ -20,23 +40,17 @@ export function createBookListData(index = 0, total = 8) {
     const titleStr = '小说名小说名小说名';
     const decStr = '小说描述小说描述小说描述小说描述';
     for (let i = index; i < index + total; i++) {
-        bookId++;
-        list.push({
-            id: bookId.toString(),
-            index: i,
-            /** 封面图 */
-            thumb: images[Math.floor(Math.random() * images.length)],
-            /** 小说名 */
-            name: `小说${bookId} ${titleStr.slice(Math.floor(Math.random() * titleStr.length))}`,
-            /** 描述 */
-            info: `小说描述${decStr.slice(Math.floor(Math.random() * decStr.length))}`,
-            /** 评分 */
-            score: `${(Math.floor(Math.random() * 100) / 10).toFixed(1)}`,
-            /** 标签 */
-            label: '都市·穿越·完结·29万人在读',
-            /** 小说热度 */
-            value: '785万热度'
-        })
+        bookId ++;
+        const item = createBookInfo();
+        item.id = bookId;
+        item.index = i;
+        item.thumb = images[Math.floor(Math.random() * images.length)];
+        item.name = `小说${bookId} ${titleStr.slice(Math.floor(Math.random() * titleStr.length))}`;
+        item.info = `小说描述${decStr.slice(Math.floor(Math.random() * decStr.length))}`;
+        item.score = `${(Math.floor(Math.random() * 100) / 10).toFixed(1)}`;
+        item.label = '都市·穿越·完结·29万人在读';
+        item.value = '785万热度';
+        list.push(item);
     }
     return list;
 }
