@@ -1,0 +1,4 @@
+// 每个页面需要引入的文件，注意：vue.config.js 中配置的 css.loaderOptions 是无法在当前项目生效的，
+// 可能是uni-app项目设定和标准vue-cli项目设定不一样导致的，需要在当前文件全局引入即可
+@import "./styles/variable.scss";
+@import "./styles/mixins.scss";

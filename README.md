@@ -1,4 +1,29 @@
-# Reader-Vue
-基于Vue实现的小说阅读器，支持手势滑动、点击切换页面、字体调节和章节内容切换
+# 基于vue实现的小说app阅读器
 
-**详细说明请到[我的掘金介绍](https://juejin.im/post/5e96836be51d4546c0383afa)中查看**
+### sass安装失败时配置（window系统）cmd 窗口首先执行命令再初始化
+```
+set sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+```
+
+## 初始化项目
+```
+npm install
+```
+
+### 运行项目
+```
+npm run serve
+```
+
+### 打包项目，这边建议用官方 HBuildX IDE 去打包
+```
+npm run build
+```
+
+### 在 HBuildX 控制台中出现版本更新提示需要手动升级一下项目
+```
+npm update
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/)

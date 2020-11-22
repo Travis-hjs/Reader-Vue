@@ -1,0 +1,51 @@
+@import "./mixins.scss";
+
+page{ background-color: #fff; width: 100%; box-sizing: border-box; min-height: 100vh; }
+view, button, input, textarea{ box-sizing: border-box; font-family: "Arial", "Helvetica Neue", "Helvetica", "sans-serif"; }
+image, input, textarea, picker{ display: block; width: 100%; }
+input::after, input::before, button::after, button::before{ border: none; }
+
+// h5默认是100vh,即使页面没有内容也会滚动，这里取消这个设定
+// 注意：scss 条件编译必须以 css 注释为标准才能条件编译
+/* #ifdef H5 */
+uni-page-body{ min-height: auto !important; }
+/* #endif */
+
+/* iphoneX 吸底适配（前提是用了定位）*/
+.iphonex_bottom{ bottom: 36rpx !important; }
+.iphonex_bottom::before{ content: ""; position: absolute; bottom: 0; left: 0; transform: translateY(100%); width: 100%; height: 36rpx; background-color: #181818; z-index: 10; }
+/* iphoneX 吸底适配（底部占位容器）*/
+.iphonex_bottom_view{ width: 100%; height: 36rpx; }
+
+/* flex布局 */
+.flex{ @include flex(); }
+.f1{ flex: 1; }
+.f2{ flex: 2; }
+.f3{ flex: 3; }
+/* 垂直居中 */
+.fvertical{ @include fvertical(); }
+/* 水平居中 */
+.fcenter{ @include fcenter(); }
+/* 右对齐 */
+.fright{ @include fright(); }
+
+/* 溢出...显示 当前节点生效 */
+.ellipsis{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 溢出...显示 子节点生效 */
+.ellipsis_1{ @include ellipsis(1); }
+.ellipsis_2{ @include ellipsis(2); }
+.ellipsis_3{ @include ellipsis(3); }
+
+/* 卡片 */
+.card{ 
+    border-radius: 2px; 
+    box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12); 
+    background-color: #fff;
+    overflow: hidden;
+}
+
+.button{ @include button(); }
+.button_dark{ @include button(); background-color: $dark; color: #e3b480; }
+.button_pink{  @include button(); background-color: $pink; border-color: $pink; color: $white; }
+.button_red{ @include button(); background-color: $red; border-color: $red; color: $white; }

@@ -1,0 +1,64 @@
+{
+	"pages": [
+        {
+			"path": "pages/taBarHome/home",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+        },
+        {
+			"path": "pages/taBarHome/personal",
+			"style": {
+				"navigationBarTitleText": "个人页"
+			}
+        },
+        {
+            "path": "pages/details",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/list",
+            "style": {
+                "navigationBarTitleText": "加载更多列表",
+                "navigationBarBackgroundColor": "#222222",
+                "navigationBarTextStyle": "white",
+                "enablePullDownRefresh": true
+            }
+        },
+        {
+            "path": "pages/book",
+            "style": {
+                "navigationBarTitleText": "小说阅读器",
+                "navigationStyle": "custom"
+            }
+        }
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+    },
+    "tabBar": {
+        "color": "#7A7E83",
+        "selectedColor": "#000000",
+        "borderStyle": "white",
+        "backgroundColor": "#f4f4f4",
+        "list": [
+            {
+                "pagePath": "pages/taBarHome/home",
+                "iconPath": "static/home_off.png",
+                "selectedIconPath": "static/home_on.png",
+                "text": "首页"
+            },
+            {
+                "pagePath": "pages/taBarHome/personal",
+                "iconPath": "static/personal_off.png",
+                "selectedIconPath": "static/personal_on.png",
+                "text": "我的"
+            }
+        ]
+    }
+}
