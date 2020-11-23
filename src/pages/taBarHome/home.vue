@@ -20,8 +20,11 @@ import {
 })
 export default class HomePage extends Vue {
 
-    private list = createBookListData();
+    private list = createBookListData(0, 0);
 
+    onLoad() {
+        this.list = createBookListData();
+    }
 }
 </script>
 

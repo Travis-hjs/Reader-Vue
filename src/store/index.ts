@@ -10,7 +10,7 @@ export class StoreUserInfo extends ModuleAppOption {
     
     constructor() {
         super()
-        this.initBookAppOption()
+        this.initBookOption()
     }
 
     readonly icon = {
@@ -52,8 +52,8 @@ export class StoreUserInfo extends ModuleAppOption {
         }
     }
 
-    /** 小说`APP`操作信息 */
-    readonly bookAppOption = {
+    /** 小说操作信息 */
+    readonly bookOption = {
         /** 是否首次打开 */
         first: true,
         /** 主题 */
@@ -73,21 +73,21 @@ export class StoreUserInfo extends ModuleAppOption {
         }
     }
 
-    /** 保存小说`APP`操作信息 */
-    saveBookAppOption() {
-        uni.setStorageSync("book-app-option", JSON.stringify(this.bookAppOption));
+    /** 保存小说操作信息 */
+    saveBookOption() {
+        uni.setStorageSync("book-app-option", JSON.stringify(this.bookOption));
     }
 
-    /** 获取小说`APP`操作信息 */
-    private initBookAppOption() {
+    /** 获取小说操作信息 */
+    private initBookOption() {
         const data = uni.getStorageSync("book-app-option");
         if (data) {
-            this.modifyData(this.bookAppOption, JSON.parse(data))
+            this.modifyData(this.bookOption, JSON.parse(data))
         }
     }
 
-    /** 清除小说`APP`操作信息 */
-    removeBookAppOption() {
+    /** 清除小说操作信息 */
+    removeBookOption() {
         uni.removeStorageSync("book-app-option");
     }
 

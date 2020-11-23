@@ -20,6 +20,12 @@ export default class ModuleAppOption extends ModuleModifyObject {
         tabBarHeight: 0,
         /** 可使用窗口高度 */
         windowHeight: 0,
+        /** 可使用窗口宽度 */
+        windowWidth: 0,
+        /** 屏幕宽度 */
+        screenWidth: 0,
+        /** 屏幕高度 */
+        screenHeight: 0,
         /** 是否为`iPhoneX`系列（做底部`UI`判断） */
         isIPhoneX: false
     }
@@ -34,6 +40,9 @@ export default class ModuleAppOption extends ModuleModifyObject {
         this.appOption.statusBarHeight = systemInfo.statusBarHeight;
         this.appOption.tabBarHeight = systemInfo.screenHeight - systemInfo.windowHeight - systemInfo.statusBarHeight;
         this.appOption.windowHeight = systemInfo.windowHeight;
+        this.appOption.windowWidth = systemInfo.windowWidth;
+        this.appOption.screenWidth = systemInfo.screenWidth
+        this.appOption.screenHeight = systemInfo.screenHeight
 
         const isIos = systemInfo.system.toLocaleLowerCase().includes("ios");
         const vaule = (systemInfo.screenWidth / systemInfo.screenHeight) < 0.5;

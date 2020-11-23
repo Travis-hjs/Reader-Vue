@@ -1,15 +1,15 @@
 <template>
-    <view :class="['book', showMenu ? '' : 'hide_menu', themes[AppOption.theme].className]">
+    <view :class="['book', showMenu ? '' : 'hide_menu', themes[bookOption.theme].className]">
         <!-- 顶部菜单 -->
-        <view class="top">
+        <view class="top_menu" :style="{ 'padding-top': appOption.statusBarHeight + 'px'}">
             <view class="back" @click="goBack()">
-                <Icons type="arrowleft" size="22" :color="themes[AppOption.theme].text" />
+                <Icons type="arrowleft" size="22" :color="themes[bookOption.theme].text" />
             </view>
             <view class="option">
                 <view class="option_btn">下载</view>
                 <view class="option_btn">加入书架</view>
                 <view class="option_btn">
-                    <Icons type="more-filled" size="18" :color="themes[AppOption.theme].text" />
+                    <Icons type="more-filled" size="18" :color="themes[bookOption.theme].text" />
                 </view>
             </view>
         </view>
@@ -17,9 +17,20 @@
         <!-- 阅读内容页 -->
         <view class="content" @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
 
-            <view class="page" v-for="(style, index) in styles" :key="index" :style="{ transition: style.transition, transform: 'translate3d('+ style.transform +',0px,0px)', zIndex: style.zIndex }">
-                <view class="status_bar"></view>
-                <view class="info">
+            <view class="page" v-for="(style, index) in styles" :key="index" :style="{ 
+                'transition': style.transition, 
+                'transform': 'translate3d('+ style.transform +',0px,0px)', 
+                'z-index': style.zIndex,
+                'padding' : `${styleInfo.pagePaddingTop}px ${styleInfo.pagePaddingRight}px`
+            }">
+                <!-- 顶部状态占位 -->
+                <view class="status_bar" :style="{ 'height': appOption.statusBarHeight + 'px'}"></view>
+                
+                <!-- 小说信息 -->
+                <view class="info_box" :style="{ 
+                    'height': styleInfo.infoHeight + 'px', 
+                    'margin-bottom': styleInfo.infoMarginBottom  + 'px'
+                }">
                     <view class="name">小说名</view>
                     <view class="integral">
                         <text class="text">300币</text>
@@ -29,17 +40,17 @@
                 
                 <!-- 小说标题 -->
                 <view :style="{ 
-                    fontSize: AppOption.sizeInfo.title + 'px', 
-                    lineHeight: AppOption.sizeInfo.tineHeight + 'px', 
-                    marginBottom: AppOption.sizeInfo.margin +'px', 
+                    'font-size': bookOption.sizeInfo.title + 'px', 
+                    'line-height': bookOption.sizeInfo.tineHeight + 'px', 
+                    'margin-bottom': bookOption.sizeInfo.margin +'px', 
                 }" v-show="pageTextList[index].title">{{ pageTextList[index].title }}</view>
 
                 <!-- 小说段落 -->
                 <view :style="{ 
-                    fontSize: AppOption.sizeInfo.p + 'px', 
-                    lineHeight: AppOption.sizeInfo.pLineHeight + 'px', 
-                    marginBottom: AppOption.sizeInfo.margin +'px',
-                    textIndent: '24px'
+                    'font-size': bookOption.sizeInfo.p + 'px', 
+                    'line-height': bookOption.sizeInfo.pLineHeight + 'px', 
+                    'margin-bottom': bookOption.sizeInfo.margin +'px',
+                    'text-indent': styleInfo.indent + 'px'
                 }" v-for="(p, pIndex) in pageTextList[index].content" :key="pIndex">{{ p }}</view>
 
             </view>
@@ -50,13 +61,13 @@
         <view class="bottom">
             <view class="switch">
                 <view class="switch_icon" @click="chapterPrev()">
-                    <Icons type="arrowleft" size="22" :color="themes[AppOption.theme].text" />
+                    <Icons type="arrowleft" size="22" :color="themes[bookOption.theme].text" />
                 </view>
                 <view style="flex: 1">
-                    <slider :value="chapterIndex" @change="sliderChapter" :max="chapterMax" :block-color="themes[AppOption.theme].text" block-size="20" :activeColor="themes[AppOption.theme].text" :backgroundColor="themes[AppOption.theme].slide" />
+                    <slider :value="chapterIndex" @change="sliderChapter" :max="chapterMax" :block-color="themes[bookOption.theme].text" block-size="20" :activeColor="themes[bookOption.theme].text" :backgroundColor="themes[bookOption.theme].slide" />
                 </view>
                 <view class="switch_icon" @click="chapterNext()">
-                    <Icons type="arrowright" size="22" :color="themes[AppOption.theme].text" />
+                    <Icons type="arrowright" size="22" :color="themes[bookOption.theme].text" />
                 </view>
             </view>
             <view class="menu">
@@ -76,7 +87,7 @@
             </view>
             <view class="menu">
                 <view class="menu_tip">背景主题</view>
-                <view :class="['theme', AppOption.theme == index ? 'theme_on' : '', item.className]" v-for="(item, index) in themes" :key="index" @click="switchTheme(index)"></view>
+                <view :class="['theme', bookOption.theme == index ? 'theme_on' : '', item.className]" v-for="(item, index) in themes" :key="index" @click="switchTheme(index)"></view>
             </view>
         </view>
 
@@ -107,16 +118,20 @@ const dragTime = 300;
     }
 })
 export default class BookReader extends Vue {
-    /** `APP`操作信息 */
-    readonly AppOption = store.bookAppOption;
+    readonly appOption = store.appOption;
+    /** 小说操作信息 */
+    readonly bookOption = store.bookOption;
+    /** 样式参数 */
+    readonly styleInfo = {
+        pagePaddingTop: 8,
+        pagePaddingRight: 16,
+        infoHeight: 30,
+        infoMarginBottom: 10,
+        /** 段落缩进 */
+        indent: 24
+    }
     /** 显示菜单 */
     showMenu = false;
-    /** 页面宽度 */
-    pageWidth = 0;
-    /** 页面高度 */
-    pageHeight = 0;
-    /** 状态栏高度 */
-    statusBarHeight = 0;
     /** 页面负偏移量（负数） */
     pageSlideValue = 0;
     /** 触摸位置 */
@@ -129,7 +144,11 @@ export default class BookReader extends Vue {
     slideTimer: number | null = null;
     /** 是否开始触摸 */
     startTouch = false;
-
+    /** 页面高度 */
+    pageHeight = 0;
+    /** 页面宽度 */
+    pageWidth = 0;
+    
     readonly styles = [
         {
             transform: "-102%",
@@ -190,7 +209,7 @@ export default class BookReader extends Vue {
     cacheData: Array<{title: string, content: string}> = [];
 
     /** 页面内容列表 */
-    pageTextList: Array<{title: string, content: Array<string>}> = [
+    readonly pageTextList: Array<{title: string, content: Array<string>}> = [
         {
             title: "", // "page-1",
             content: []
@@ -203,10 +222,20 @@ export default class BookReader extends Vue {
         }
     ];
     
+    /** 是否为第一页 */
+    get isFirstPage() {
+        return (this.chapterIndex == 0 && this.chapterPage == 0);
+    }
+
+    /** 否最后一页 */
+    get isLastPage() {
+        return (this.chapterIndex == this.chapterMax && this.chapterPage == this.chapterList[this.chapterIndex].length - 1);
+    }
+
     /** 关闭新手提示 */
     closeBookTip() {
-        this.AppOption.first = this.firstTip = false;
-        store.saveBookAppOption();
+        this.bookOption.first = this.firstTip = false;
+        store.saveBookOption();
     }
 
     /** 返回上层页面 */
@@ -221,16 +250,14 @@ export default class BookReader extends Vue {
      * @param index
      */
     switchTheme(index: number) {
-        this.AppOption.theme = index;
-        store.saveBookAppOption();
+        this.bookOption.theme = index;
+        store.saveBookOption();
     }
 
     /** 初始化获取页面信息 */
     initPageInfo() {
-        this.pageWidth = uni.getSystemInfoSync().windowWidth;
-        this.pageHeight = uni.getSystemInfoSync().windowHeight;
-        this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-        this.pageSlideValue = -(this.pageWidth + 5);
+        // console.log("this.appOption >>", this.appOption);
+        this.pageSlideValue = -(this.appOption.screenWidth + 5);
         this.styles[0].transform = `${this.pageSlideValue}px`;
         // 获取数据
         this.getChapterData(this.chapterIndex, res => {
@@ -300,9 +327,9 @@ export default class BookReader extends Vue {
             this.slideTimer = null;
         }, slideTime);
     }
-
-    onTouchStart(e: any) {
-        // console.log(e);
+    
+    onTouchStart(e: TouchEvent) {
+        // console.log("onTouchStart >>", e);
         if (this.slideTimer !== null) return;
         this.startTouch = true;
         const pageX = e.touches[0].pageX;
@@ -310,7 +337,7 @@ export default class BookReader extends Vue {
         this.touchTime = Date.now();
     }
 
-    onTouchMove(e: any) {
+    onTouchMove(e: TouchEvent) {
         if (!this.startTouch) return;
         if (this.showMenu) return;
         const pageX = e.touches[0].pageX;
@@ -325,14 +352,14 @@ export default class BookReader extends Vue {
         // console.log("onTouchMove", slide);
     }
 
-    onTouchEnd(e: any) {
+    onTouchEnd(e: TouchEvent) {
         if (!this.startTouch) return;
         this.startTouch = false;
         if (this.showMenu) return this.showMenu = false;
         const pageX = e.changedTouches[0].pageX;
         const now = Date.now();
         const slideX = pageX - this.touchPosition;
-        const value = this.pageWidth / 3;
+        const value = this.appOption.screenWidth / 3;
         /** 返回原来位置 */
         const backPosition = () => {
             this.styles[0].transition = `${slideTime}ms all`;
@@ -344,14 +371,14 @@ export default class BookReader extends Vue {
         if (Math.abs(slideX) <= 0) {
             if (pageX < value) {
                 // console.log("点击左边");
-                if (this.isFirstPage()) { 
+                if (this.isFirstPage) { 
                     utils.showToast("没有上一页了");
                 }else {
                     this.pagePrev();
                 } 
             } else if (pageX > value * 2) {
                 // console.log("点击右边");
-                if (this.isLastPage()) {
+                if (this.isLastPage) {
                     utils.showToast("当前小说已完结");
                 } else {
                     this.pageNext();
@@ -365,7 +392,7 @@ export default class BookReader extends Vue {
             if (now - this.touchTime < dragTime || (now - this.touchTime > dragTime && Math.abs(slideX) >= value)) {
                 if (slideX > 0) {
                     // console.log("向右边滑动");
-                    if (this.isFirstPage()) {
+                    if (this.isFirstPage) {
                         utils.showToast("没有上一页了");
                         backPosition();
                     } else {
@@ -373,7 +400,7 @@ export default class BookReader extends Vue {
                     }
                 } else {
                     // console.log("向左边滑动");
-                    if (this.isLastPage()) {
+                    if (this.isLastPage) {
                         utils.showToast("当前小说已完结");
                         backPosition();
                     } else {
@@ -422,12 +449,12 @@ export default class BookReader extends Vue {
 
     /** 加大字体 */
     addFontSize() {
-        if (this.AppOption.sizeInfo.p >= 22) return utils.showToast("已经是最大字体了");
-        this.AppOption.sizeInfo.title ++;
-        this.AppOption.sizeInfo.p ++;
-        this.AppOption.sizeInfo.tLineHeight = this.AppOption.sizeInfo.title * 1.5;
-        this.AppOption.sizeInfo.pLineHeight = this.AppOption.sizeInfo.p * 1.5;
-        store.saveBookAppOption();
+        if (this.bookOption.sizeInfo.p >= 22) return utils.showToast("已经是最大字体了");
+        this.bookOption.sizeInfo.title ++;
+        this.bookOption.sizeInfo.p ++;
+        this.bookOption.sizeInfo.tLineHeight = this.bookOption.sizeInfo.title * 1.5;
+        this.bookOption.sizeInfo.pLineHeight = this.bookOption.sizeInfo.p * 1.5;
+        store.saveBookOption();
 
         this.getChapterData(this.chapterIndex, res => {
             this.updateChapterList(this.chapterIndex, res);
@@ -437,12 +464,12 @@ export default class BookReader extends Vue {
 
     /** 缩小字体 */
     reduceFontSize() {
-        if (this.AppOption.sizeInfo.p <= 15) return utils.showToast("已经是最小字体了");
-        this.AppOption.sizeInfo.title --;
-        this.AppOption.sizeInfo.p --;
-        this.AppOption.sizeInfo.tLineHeight = this.AppOption.sizeInfo.title * 1.5;
-        this.AppOption.sizeInfo.pLineHeight = this.AppOption.sizeInfo.p * 1.5;
-        store.saveBookAppOption();
+        if (this.bookOption.sizeInfo.p <= 15) return utils.showToast("已经是最小字体了");
+        this.bookOption.sizeInfo.title --;
+        this.bookOption.sizeInfo.p --;
+        this.bookOption.sizeInfo.tLineHeight = this.bookOption.sizeInfo.title * 1.5;
+        this.bookOption.sizeInfo.pLineHeight = this.bookOption.sizeInfo.p * 1.5;
+        store.saveBookOption();
 
         this.getChapterData(this.chapterIndex, res => {
             this.updateChapterList(this.chapterIndex, res);
@@ -459,9 +486,11 @@ export default class BookReader extends Vue {
         /** 当前章节的段落列表 */
         const contents = data.content.split(paragraphSeparate);
         /** 下边距 */
-        const margin = this.AppOption.sizeInfo.margin;
+        const margin = this.bookOption.sizeInfo.margin;
         /** 内容实际宽度 */
-        const width = this.pageWidth - 32;
+        const width = this.appOption.screenWidth - (this.styleInfo.pagePaddingRight * 2);
+        /** 单个字体的宽度 */
+        const sizeWidth = 1;
         /** 计算的页数 */
         let page = 0;
         /** 是否第一页 */
@@ -479,21 +508,19 @@ export default class BookReader extends Vue {
         // 先重置为一个空的数组，因为二维数组的值初始化是`undefined`
         this.chapterList[chapter] = [];
 
-        // console.log("页面高度", this.pageHeight);
+        // console.log("页面高度", this.appOption.screenHeight);
         // console.log("页面实际宽度", width);
-
+        
         for (let i = 0; i < contents.length; i++) {
-            /** 单个字体的宽度 */
-            const sizeWidth = 1;
             const item = contents[i];
-            const fontWidth = item.length * (this.AppOption.sizeInfo.p * sizeWidth) + 24; // 24 是段落缩进像素
+            const fontWidth = item.length * (this.bookOption.sizeInfo.p * sizeWidth) + this.styleInfo.indent;
             const row = Math.ceil(fontWidth / width);
-            const itemHeight = row * this.AppOption.sizeInfo.pLineHeight + margin;
+            const itemHeight = row * this.bookOption.sizeInfo.pLineHeight + margin;
             // console.log(`第${i + 1}段`, row + "行", fontWidth, item);
             // console.log(`第${i + 1}段`, row + "行");
             
             if (firstPage) {
-                height += this.AppOption.sizeInfo.tLineHeight + margin;
+                height += this.bookOption.sizeInfo.tLineHeight + margin;
                 firstPage = false;
             } 
             
@@ -509,10 +536,8 @@ export default class BookReader extends Vue {
             list.push(item);
             height += itemHeight;
             
-            /**
-             * 56是 .info + .page padding的上下距离 
-             */
-            if (height - margin > this.pageHeight - 56 - this.statusBarHeight) {
+            // 判断是否超出一页的高度
+            if (height - margin > this.appOption.screenHeight - this.styleInfo.infoHeight - this.styleInfo.infoHeight - (this.styleInfo.pagePaddingTop * 2) - this.appOption.statusBarHeight) {
                 list.pop();
                 nextPageText.height = itemHeight;
                 nextPageText.text = item;
@@ -545,7 +570,7 @@ export default class BookReader extends Vue {
         }
 
         // 上一页显示的内容 =====================================================================
-        if (this.isFirstPage()) {
+        if (this.isFirstPage) {
             this.pageTextList[0].title = "";
             this.pageTextList[0].content = [];
         } else if (this.chapterPage == 0) {
@@ -570,7 +595,7 @@ export default class BookReader extends Vue {
         this.pageTextList[1].content = contents[this.chapterPage].content;
 
         // 下一页显示的内容 =====================================================================
-        if (this.isLastPage()) {
+        if (this.isLastPage) {
             // 最后一章最后一页
             this.pageTextList[2].title = "";
             this.pageTextList[2].content = [];
@@ -589,16 +614,6 @@ export default class BookReader extends Vue {
             this.pageTextList[2].content = contents[this.chapterPage + 1].content;
         }
 
-    }
-
-    /** 是否为第一页 */
-    isFirstPage() {
-        return (this.chapterIndex == 0 && this.chapterPage == 0);
-    }
-
-    /** 否最后一页 */
-    isLastPage() {
-        return (this.chapterIndex == this.chapterMax && this.chapterPage == this.chapterList[this.chapterIndex].length - 1);
     }
     
     /**
@@ -626,7 +641,7 @@ export default class BookReader extends Vue {
     }
 
     onLoad(params: any) {
-        if (this.AppOption.first) {
+        if (this.bookOption.first) {
             setTimeout(() => {
                 this.firstTip = true;
             }, 500);
@@ -642,7 +657,7 @@ export default class BookReader extends Vue {
 }
 </script>
 <style lang="scss">
-.status_bar { height: var(--status-bar-height); width: 100%; }
+.status_bar { width: 100%; }
 .book {
     width: 100%;
     height: 100vh; 
@@ -653,94 +668,110 @@ export default class BookReader extends Vue {
     box-sizing: border-box;
 }
 /* 顶部菜单栏 */
-.top{ width: 100%; height: 88rpx; padding-top: var(--status-bar-height); position: fixed; top: 0; left: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; overflow: hidden; transition: .3s all;}
-.top .back{ padding: 14rpx; }
-.top .option{ flex: 1; display: flex; flex-wrap: wrap; flex-direction: row; justify-content: flex-end;}
-.top .option_btn{ font-size: 30rpx; margin-right: 10rpx; padding: 10rpx; }
-
-/* 底部菜单栏 */
-.bottom{ position: fixed; bottom: 0; left: 0; width: 100%; transition: .3s all; z-index: 6; padding: 30rpx 0; }
-.bottom .switch{ width: 100%; display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 20rpx; }
-.bottom .switch_icon{ padding: 14rpx; }
-.bottom .menu{ width: 100%; height: 100rpx; display: flex; flex-wrap: wrap; align-items: center; }
-.bottom .menu .menu_tip{ font-size: 24rpx; padding: 0 40rpx; }
-.bottom .menu .theme{ width: 66rpx; height: 66rpx; border-radius: 50%; margin-right: 50rpx; box-sizing: border-box; }
-.bottom .menu .theme:nth-child(6) { margin-right: 0; }
-.bottom .menu .book_pos{ font-size: 30rpx; }
-.bottom .menu .size_setting{ flex: 1; display: flex; flex-wrap: wrap; align-items: center; }
-.bottom .menu .size_btn{ flex: 1; text-align: center; line-height: 70rpx; font-size: 30rpx; margin-right: 30rpx; border-radius: 35rpx; background-color: rgba(0,0,0,0.1); }
-
-/* 内容容器 */
-.content{ width: 100%; height: 100%; position: relative; }
-.content .page{ width: 100%; height: 100%; padding: 8px 16px; box-sizing: border-box; box-shadow: 0 5px 10px rgba(0,0,0,0.5); position: absolute; top: 0; left: 0; overflow: hidden; }
-.content .info{ width: 100%; height: 30px; margin-bottom: 10px; display: flex; flex-wrap: wrap; align-items: center; }
-.content .info .name{ font-size: 30rpx; flex: 1; }
-.content .info .integral{ padding: 0 40rpx; background-color: rgba(0, 0, 0, 0.05); line-height: 40rpx; border-radius: 20rpx; position: relative; }
-.content .info .integral .text{ font-size: 28rpx; font-weight: bold; }
-.content .info .integral .icon{ position: absolute; font-size: 30rpx; line-height: 50rpx; width: 50rpx; text-align: center; top: -5rpx; left: -20rpx; border-radius: 50%; color: transparent; }
+.top_menu{ 
+    width: 100%; min-height: 88rpx; position: fixed; top: 0; left: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; overflow: hidden; transition: .3s all; box-sizing: content-box;
+    .back{ padding: 14rpx; }
+    .option{ flex: 1; display: flex; flex-wrap: wrap; flex-direction: row; justify-content: flex-end; }
+    .option_btn{ font-size: 30rpx; margin-right: 10rpx; padding: 10rpx; }
+}
 
 /* 菜单显示隐藏 */
-.hide_menu .top{ transform: translateY(-100%); }
-.hide_menu .bottom{ transform: translateY(100%); }
+.hide_menu {
+    .top_menu{ transform: translateY(-100%); }
+    .bottom{ transform: translateY(100%); }
+}
+
+/* 底部菜单栏 */
+.bottom{ 
+    position: fixed; bottom: 0; left: 0; width: 100%; transition: .3s all; z-index: 6; padding: 30rpx 0; 
+    .switch{ width: 100%; display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 20rpx; }
+    .switch_icon{ padding: 14rpx; }
+    .menu{ 
+        width: 100%; height: 100rpx; display: flex; flex-wrap: wrap; align-items: center; 
+        .menu_tip{ font-size: 24rpx; padding: 0 40rpx; }
+        .theme{ 
+            width: 66rpx; height: 66rpx; border-radius: 50%; margin-right: 50rpx; box-sizing: border-box; 
+            &:nth-child(6) { margin-right: 0; }
+        }
+        .book_pos{ font-size: 30rpx; }
+        .size_setting{ flex: 1; display: flex; flex-wrap: wrap; align-items: center; }
+        .size_btn{ flex: 1; text-align: center; line-height: 70rpx; font-size: 30rpx; margin-right: 30rpx; border-radius: 35rpx; background-color: rgba(0,0,0,0.1); }
+    }
+}
+
+/* 内容容器 */
+.content{ 
+    width: 100%; height: 100%; position: relative; 
+    .page{ width: 100%; height: 100%; box-sizing: border-box; box-shadow: 0 5px 10px rgba(0,0,0,0.5); position: absolute; top: 0; left: 0; overflow: hidden; }
+    .info_box{ 
+        width: 100%; display: flex; flex-wrap: wrap; align-items: center; 
+        .name{ font-size: 30rpx; flex: 1; }
+        .integral{ 
+            padding: 0 40rpx; background-color: rgba(0, 0, 0, 0.05); line-height: 40rpx; border-radius: 20rpx; position: relative; 
+            .text{ font-size: 28rpx; font-weight: bold; }
+            .icon{ position: absolute; font-size: 30rpx; line-height: 50rpx; width: 50rpx; text-align: center; top: -5rpx; left: -20rpx; border-radius: 50%; color: transparent; }
+        }
+    }
+}
 
 /* 主题 */
 .theme1{ background-color: #fff; }
 .theme1 .page{ background-color: #dfd8d0; color: #322b23; }
-.theme1 .top { background-color: #fff; }
-.theme1 .top .option_btn{ color: #383838; }
+.theme1 .top_menu { background-color: #fff; }
+.theme1 .top_menu .option_btn{ color: #383838; }
 .theme1 .bottom{ background-color: #fff; }
-.theme1 .content .info .name{ color: #83775c; }
-.theme1 .content .info .integral{ background-color: #d7d0c8; }
-.theme1 .content .info .integral .text{ color: #383838; }
-.theme1 .content .info .integral .icon{ background-color: #979088; color: #dfd8d0; }
+.theme1 .content .info_box .name{ color: #83775c; }
+.theme1 .content .info_box .integral{ background-color: #d7d0c8; }
+.theme1 .content .info_box .integral .text{ color: #383838; }
+.theme1 .content .info_box .integral .icon{ background-color: #979088; color: #dfd8d0; }
 .theme1 .bottom .menu{ color: #383838; }
 .theme1 .bottom .menu .theme_on{ border: 2px #383838 solid; }
 
 .theme2{ background-color: #ded9c6; }
 .theme2 .page{ background-color: #c9c0a3; color: #443109; }
-.theme2 .top { background-color: #ded9c6; }
-.theme2 .top .option_btn{ color: #362302; }
+.theme2 .top_menu { background-color: #ded9c6; }
+.theme2 .top_menu .option_btn{ color: #362302; }
 .theme2 .bottom{ background-color: #ded9c6; }
-.theme2 .content .info .name{ color: #83775c; }
-.theme2 .content .info .integral{ background-color: #c3b9a0; }
-.theme2 .content .info .integral .text{ color: #362302; }
-.theme2 .content .info .integral .icon{ background-color: #977e5f; color: #c9c0a3; }
+.theme2 .content .info_box .name{ color: #83775c; }
+.theme2 .content .info_box .integral{ background-color: #c3b9a0; }
+.theme2 .content .info_box .integral .text{ color: #362302; }
+.theme2 .content .info_box .integral .icon{ background-color: #977e5f; color: #c9c0a3; }
 .theme2 .bottom .menu{ color: #362302; }
 .theme2 .bottom .menu .theme_on{ border: 2px #362302 solid; }
 
 .theme3{ background-color: #d9e3cb; }
 .theme3 .page{ background-color: #c7c7af; color: #302f1a; }
-.theme3 .top { background-color: #d9e3cb; }
-.theme3 .top .option_btn{ color: #252a24; }
+.theme3 .top_menu { background-color: #d9e3cb; }
+.theme3 .top_menu .option_btn{ color: #252a24; }
 .theme3 .bottom{ background-color: #d9e3cb; }
-.theme3 .content .info .name{ color: #83775c; }
-.theme3 .content .info .integral { background-color: #bfbfa7; }
-.theme3 .content .info .integral .text{ color: #252a24; }
-.theme3 .content .info .integral .icon{ background-color: #8f927d; color: #c7c7af; }
+.theme3 .content .info_box .name{ color: #83775c; }
+.theme3 .content .info_box .integral { background-color: #bfbfa7; }
+.theme3 .content .info_box .integral .text{ color: #252a24; }
+.theme3 .content .info_box .integral .icon{ background-color: #8f927d; color: #c7c7af; }
 .theme3 .bottom .menu{ color: #252a24; }
 .theme3 .bottom .menu .theme_on{ border: 2px #252a24 solid; }
 
 .theme4{ background-color: #cbd8e1; }
 .theme4 .page{ background-color: #bbbfc2; color: #454142; }
-.theme4 .top { background-color: #cbd8e1; }
-.theme4 .top .option_btn{ color: #353a3d; }
+.theme4 .top_menu { background-color: #cbd8e1; }
+.theme4 .top_menu .option_btn{ color: #353a3d; }
 .theme4 .bottom{ background-color: #cbd8e1; }
-.theme4 .content .info .name{ color: #83775c; }
-.theme4 .content .info .integral{ background-color: #b4b8bb; }
-.theme4 .content .info .integral .text{ color: #353a3d; }
-.theme4 .content .info .integral .icon{ background-color: #85898c; color: #bbbfc2; }
+.theme4 .content .info_box .name{ color: #83775c; }
+.theme4 .content .info_box .integral{ background-color: #b4b8bb; }
+.theme4 .content .info_box .integral .text{ color: #353a3d; }
+.theme4 .content .info_box .integral .icon{ background-color: #85898c; color: #bbbfc2; }
 .theme4 .bottom .menu{ color: #353a3d; }
 .theme4 .bottom .menu .theme_on{ border: 2px #353a3d solid; }
 
 .theme5{ background-color: #161616; }
 .theme5 .page{ background-color: #211a12; color: #6e675f; }
-.theme5 .top { background-color: #161616; }
-.theme5 .top .option_btn{ color: #6f6f6f; }
+.theme5 .top_menu { background-color: #161616; }
+.theme5 .top_menu .option_btn{ color: #6f6f6f; }
 .theme5 .bottom{ background-color: #161616; }
-.theme5 .content .info .name{ color: #83775c; }
-.theme5 .content .info .integral{ background-color: #31281d; }
-.theme5 .content .info .integral .text{ color: #6f6f6f; }
-.theme5 .content .info .integral .icon{ background-color: #69625a; color: #211a12; }
+.theme5 .content .info_box .name{ color: #83775c; }
+.theme5 .content .info_box .integral{ background-color: #31281d; }
+.theme5 .content .info_box .integral .text{ color: #6f6f6f; }
+.theme5 .content .info_box .integral .icon{ background-color: #69625a; color: #211a12; }
 .theme5 .bottom .menu{ color: #6f6f6f; }
 .theme5 .bottom .menu .theme_on{ border: 2px #6f6f6f solid; }
 .theme5 .bottom .menu .size_btn{ background-color: rgba(255,255,255,0.1); }

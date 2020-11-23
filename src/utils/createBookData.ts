@@ -5,11 +5,8 @@ let bookId = 0;
 
 /** 图片列表 */
 const images = [
-    "https://muse-ui.org/img/sun.a646a52d.jpg",
-    "https://muse-ui.org/img/carousel1.dc6ba9d4.jpg",
-    "https://muse-ui.org/img/camera.1c54930e.jpg",
-    "https://muse-ui.org/img/hats.04a08b20.jpg",
-    "https://muse-ui.org/img/honey.6810375b.jpg"
+    "https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/eefa59a729d34f4fa470d9c53be410c8~tplv-k3u1fbpfcp-watermark.image",
+    "https://img.yzcdn.cn/vant/ipad.jpeg"
 ];
 
 /**
@@ -97,7 +94,7 @@ export function createBookContent(index: number) {
     }
     function outputParagraph() {
         let paragraph = "";
-        const total = utils.ranInt(30, 50);
+        const total = utils.ranInt(50, 100);
         for (let i = 0; i < total; i++) {
             paragraph += outputText();
         }
