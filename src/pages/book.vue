@@ -254,10 +254,26 @@ export default class BookReader extends Vue {
         store.saveBookOption();
     }
 
-    /** 初始化获取页面信息 */
-    initPageInfo() {
+    /** 初始化页面信息 */
+    init() {
+        if (this.bookOption.first) {
+            setTimeout(() => {
+                this.firstTip = true;
+            }, 500);
+        }
+        
         // console.log("this.appOption >>", this.appOption);
-        this.pageSlideValue = -(this.appOption.screenWidth + 5);
+        this.pageWidth = this.appOption.screenWidth
+        this.pageHeight = this.appOption.screenHeight
+        
+        // #ifdef H5
+        const page = document.querySelector(".book") as HTMLElement
+        console.log(page);
+        this.pageWidth = this.appOption.windowWidth;
+        this.pageHeight = page.clientHeight; // 微信自带浏览器下要用节点的高度才准确
+        // #endif
+
+        this.pageSlideValue = -(this.pageWidth + 5);
         this.styles[0].transform = `${this.pageSlideValue}px`;
         // 获取数据
         this.getChapterData(this.chapterIndex, res => {
@@ -359,7 +375,7 @@ export default class BookReader extends Vue {
         const pageX = e.changedTouches[0].pageX;
         const now = Date.now();
         const slideX = pageX - this.touchPosition;
-        const value = this.appOption.screenWidth / 3;
+        const value = this.pageWidth / 3;
         /** 返回原来位置 */
         const backPosition = () => {
             this.styles[0].transition = `${slideTime}ms all`;
@@ -488,7 +504,7 @@ export default class BookReader extends Vue {
         /** 下边距 */
         const margin = this.bookOption.sizeInfo.margin;
         /** 内容实际宽度 */
-        const width = this.appOption.screenWidth - (this.styleInfo.pagePaddingRight * 2);
+        const width = this.pageWidth - (this.styleInfo.pagePaddingRight * 2);
         /** 单个字体的宽度 */
         const sizeWidth = 1;
         /** 计算的页数 */
@@ -508,7 +524,7 @@ export default class BookReader extends Vue {
         // 先重置为一个空的数组，因为二维数组的值初始化是`undefined`
         this.chapterList[chapter] = [];
 
-        // console.log("页面高度", this.appOption.screenHeight);
+        // console.log("页面高度", this.pageHeight);
         // console.log("页面实际宽度", width);
         
         for (let i = 0; i < contents.length; i++) {
@@ -537,7 +553,7 @@ export default class BookReader extends Vue {
             height += itemHeight;
             
             // 判断是否超出一页的高度
-            if (height - margin > this.appOption.screenHeight - this.styleInfo.infoHeight - this.styleInfo.infoHeight - (this.styleInfo.pagePaddingTop * 2) - this.appOption.statusBarHeight) {
+            if (height - margin > this.pageHeight - this.styleInfo.infoHeight - this.styleInfo.infoHeight - (this.styleInfo.pagePaddingTop * 2) - this.appOption.statusBarHeight) {
                 list.pop();
                 nextPageText.height = itemHeight;
                 nextPageText.text = item;
@@ -641,13 +657,16 @@ export default class BookReader extends Vue {
     }
 
     onLoad(params: any) {
-        if (this.bookOption.first) {
-            setTimeout(() => {
-                this.firstTip = true;
-            }, 500);
-        }
-        this.initPageInfo();
+        // #ifndef H5
+        this.init();
+        // #endif
     }
+
+    // #ifdef H5
+    mounted() {
+        this.init();
+    }
+    // #endif
 
     onUnload() {
         if (this.slideTimer !== null) {
