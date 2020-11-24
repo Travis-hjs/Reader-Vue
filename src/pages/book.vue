@@ -31,7 +31,7 @@
                     'height': styleInfo.infoHeight + 'px', 
                     'margin-bottom': styleInfo.infoMarginBottom  + 'px'
                 }">
-                    <view class="name">小说名</view>
+                    <view class="name">{{ `小说ID: ${bookId}` }}</view>
                     <view class="integral">
                         <text class="text">300币</text>
                         <view class="icon">$</view>
@@ -222,6 +222,9 @@ export default class BookReader extends Vue {
         }
     ];
     
+    /** 小说id */
+    bookId: string = ""
+
     /** 是否为第一页 */
     get isFirstPage() {
         return (this.chapterIndex == 0 && this.chapterPage == 0);
@@ -252,34 +255,6 @@ export default class BookReader extends Vue {
     switchTheme(index: number) {
         this.bookOption.theme = index;
         store.saveBookOption();
-    }
-
-    /** 初始化页面信息 */
-    init() {
-        if (this.bookOption.first) {
-            setTimeout(() => {
-                this.firstTip = true;
-            }, 500);
-        }
-        
-        // console.log("this.appOption >>", this.appOption);
-        this.pageWidth = this.appOption.screenWidth
-        this.pageHeight = this.appOption.screenHeight
-        
-        // #ifdef H5
-        const page = document.querySelector(".book") as HTMLElement
-        console.log(page);
-        this.pageWidth = this.appOption.windowWidth;
-        this.pageHeight = page.clientHeight; // 微信自带浏览器下要用节点的高度才准确
-        // #endif
-
-        this.pageSlideValue = -(this.pageWidth + 5);
-        this.styles[0].transform = `${this.pageSlideValue}px`;
-        // 获取数据
-        this.getChapterData(this.chapterIndex, res => {
-            this.updateChapterList(this.chapterIndex, res);
-            this.updateContent();
-        });
     }
 
     /** 重置页面（位置偏移） */
@@ -656,15 +631,51 @@ export default class BookReader extends Vue {
         }
     }
 
+    /** 
+     * 初始化页面信息 
+     * @param params
+    */
+    init(params: { id: string }) {
+        console.log("页面参数 >>", params);
+        
+        params.id && (this.bookId = params.id)
+
+        if (this.bookOption.first) {
+            setTimeout(() => {
+                this.firstTip = true;
+            }, 500);
+        }
+        
+        // console.log("this.appOption >>", this.appOption);
+        this.pageWidth = this.appOption.screenWidth
+        this.pageHeight = this.appOption.screenHeight
+        
+        // #ifdef H5
+        const page = document.querySelector(".book") as HTMLElement
+        console.log(page);
+        this.pageWidth = this.appOption.windowWidth;
+        // H5浏览器下要取最低高度才准确
+        this.pageHeight = Math.min(page.clientHeight, this.appOption.windowHeight, this.appOption.screenHeight);
+        // #endif
+
+        this.pageSlideValue = -(this.pageWidth + 5);
+        this.styles[0].transform = `${this.pageSlideValue}px`;
+        // 获取数据
+        this.getChapterData(this.chapterIndex, res => {
+            this.updateChapterList(this.chapterIndex, res);
+            this.updateContent();
+        });
+    }
+
     onLoad(params: any) {
         // #ifndef H5
-        this.init();
+        this.init(params);
         // #endif
     }
 
     // #ifdef H5
     mounted() {
-        this.init();
+        this.init(utils.getQueryParam());
     }
     // #endif
 

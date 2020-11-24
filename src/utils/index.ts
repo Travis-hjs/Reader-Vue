@@ -147,6 +147,37 @@ class ModuleUtils extends ModuleControl {
         };
     }
 
+    /**
+     * 获取`url?`后面参数（JSON对象）
+     * @param name 获取指定参数名
+     * @param target 目标字段，默认`location.search`
+     * @example 
+     * ```js
+     * // 当前网址为 www.https://hjs.com?id=99&age=123&key=sdasfdfr
+     * const targetAge = getQueryParam("age", "id=12&age=14&name=hjs");
+     * const params = getQueryParam();
+     * const age = getQueryParam("age");
+     * // 非IE浏览器下简便方法
+     * new URLSearchParams(location.search).get("age");
+     * ```
+     */
+    getQueryParam(name?: string, target?: string) {
+        const code = target || location.href.split("?")[1] || "";
+        const list = code.split("&");
+        const params: any = {};
+        for (let i = 0; i < list.length; i++) {
+            const item = list[i];
+            const items = item.split("=");
+            if (items.length > 1) {
+                params[items[0]] = item.replace(`${items[0]}=`, "");
+            }
+        }
+        if (name) {
+            return params[name] || "";
+        } else {
+            return params;
+        }
+    }
 }
 
 /** 工具类模块 */
