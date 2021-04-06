@@ -1,6 +1,4 @@
-import { ModuleModifyObject } from "../modules/ModifyObject";
-
-export default class ModuleAppOption extends ModuleModifyObject {
+export default class ModuleAppOption {
     
     /** `APP`操作信息 */
     readonly appOption = {
@@ -31,7 +29,8 @@ export default class ModuleAppOption extends ModuleModifyObject {
     }
 
     /** 
-     * 初始化`APP`操作信息 
+     * 初始化`APP`操作信息
+     * @description 最好放在`App.onLaunch`执行，因为这时才是页页面初始化完成，各个尺寸值会比较准确
      * @learn 条件编译 https://uniapp.dcloud.io/platform
     */
     initAppOption() {
@@ -43,7 +42,7 @@ export default class ModuleAppOption extends ModuleModifyObject {
         this.appOption.windowWidth = systemInfo.windowWidth;
         this.appOption.screenWidth = systemInfo.screenWidth
         this.appOption.screenHeight = systemInfo.screenHeight
-
+        
         const isIos = systemInfo.system.toLocaleLowerCase().includes("ios");
         const vaule = (systemInfo.screenWidth / systemInfo.screenHeight) < 0.5;
         this.appOption.isIPhoneX = (isIos && vaule);

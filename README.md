@@ -1,4 +1,4 @@
-# 基于vue实现的小说app阅读器
+# 基于 vue 实现的小说 App 阅读器
 
 [预览地址](https://huangjingsheng.gitee.io/hjs/reader-vue)
 

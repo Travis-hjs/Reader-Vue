@@ -4,24 +4,24 @@ export class ModuleConfig {
     }
 
     /** 当前开发环境 */
-    protected readonly env!: "dev" | "prod"
+    readonly env!: "dev" | "prod"
 
     /** 请求超时毫秒 */
     readonly requestOvertime = 8000;
 
     /** 开发环境 */
     protected readonly dev = {
-        base: "http://192.168.89.53/api",
+        api: "http://192.168.89.53/api",
     }
     
     /** 生产环境 */
     protected readonly prod = {
-        base: "https://huangjingsheng.com/api"
+        api: "https://huangjingsheng.com/api"
     }
 
-    /** 基础请求域名 */
-    get baseUrl() {
-        return this[this.env].base;
+    /** `api`请求域名 */
+    get apiUrl() {
+        return this[this.env].api;
     }
 }
 

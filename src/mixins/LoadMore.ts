@@ -7,7 +7,8 @@ function createLoadMoreData(): LoadMoreType {
         state: "wait",
         list: [],
         pageIndex: 0,
-        pageSize: 10
+        pageSize: 10,
+        requestCount: 0
     }
 }
 
@@ -40,10 +41,11 @@ export default class LoadMore extends Vue {
         this.loadMoreData.state = "loading";
         this.requestList().then(result => {
             this.loadMoreData.state = "wait";
-            if (result.state === 1) {
-                this.loadMoreData.list = list.concat(result.data.data);
+            if (result.code === 1) {
+                this.loadMoreData.requestCount++;
+                this.loadMoreData.list = list.concat(result.data.list);
                 // 判断是否没有数据了
-                if (result.data.data.length < this.loadMoreData.pageSize) {
+                if (result.data.list.length < this.loadMoreData.pageSize) {
                     this.loadMoreData.state = "nomore";
                 } else {
                     this.loadMoreData.pageIndex++;
@@ -59,7 +61,18 @@ export default class LoadMore extends Vue {
             callback && callback();
         })
     }
-
+  
+    /**
+     * 刷新数据
+     * @param callback 加载结束回调
+    */
+    refreshData(callback?: () => void) {
+        this.loadMoreData.pageIndex = 0;
+        this.loadMoreData.list = [];
+        this.loadMoreData.state = "wait";
+        this.getListData(callback);
+    }
+  
     /**
      * 生命周期回调 监听页面隐藏
      *

@@ -7,7 +7,6 @@ export default Vue.extend({
     onLaunch() {
         console.log("【App Launch】")
         store.initAppOption();
-        store.initUserInfo();
     },
     onShow() {
         console.log("【App Show】")

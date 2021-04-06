@@ -3,7 +3,8 @@
         {
 			"path": "pages/taBarHome/home",
 			"style": {
-				"navigationBarTitleText": "首页"
+				"navigationBarTitleText": "首页",
+                "enablePullDownRefresh": true
 			}
         },
         {

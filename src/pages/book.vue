@@ -100,11 +100,11 @@ import { Component, Vue } from "vue-property-decorator";
 import Icons from "../components/Icons.vue";
 import BookTip from "../components/BookTip.vue";
 import utils from "../utils";
+import store from "../store";
 import {
     createBookContent,
     paragraphSeparate
 } from "../utils/createBookData";
-import store from "../store";
 
 /** 页面过渡时间（毫秒） */
 const slideTime = 260;
@@ -620,7 +620,6 @@ export default class BookReader extends Vue {
                 title: "加载中",
                 mask: true
             });
-            utils
             setTimeout(() => {
                 uni.hideLoading();
                 const data = createBookContent(chapter);

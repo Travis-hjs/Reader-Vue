@@ -1,6 +1,6 @@
 import { 
     ShowConfirmOptions 
-} from "../utils/interfaces";
+} from "./interfaces";
 
 /** 控件模块 */
 export default class ModuleControl {
@@ -34,19 +34,19 @@ export default class ModuleControl {
             mask: true
         });
     }
-
+    
     /**
      * 显示提示条
      * @param tip 提示文字
-     * @param src 图片路径
+     * @param duration 持续时间
      */
-    showToast(tip: string, src?: string) {
+    showToast(tip: string, duration = 2000) {
         uni.showToast({
             title: tip,
             // position: "bottom",
             icon: "none",
-            duration: 2000,
-            image: src
+            duration: duration,
+            // image: src
         });
     }
 
@@ -70,16 +70,16 @@ export default class ModuleControl {
      * @param options 传参对象
      */
     showConfirm(options: ShowConfirmOptions) {
-        wx.showModal({
+        uni.showModal({
             title: options.title || "操作提示",
             content: options.content,
             showCancel: true,
-            confirmText: options.text,
+            confirmText: options.text || "确认",
             success(res) {
                 if (res.confirm) {
-                    typeof options.callback === "function" && options.callback();
+                    options.callback && options.callback();
                 } else if (res.cancel) {
-                    typeof options.cancel === "function" && options.cancel();
+                    options.cancel && options.cancel();
                 }
             },
         });
@@ -101,8 +101,8 @@ export default class ModuleControl {
         uni.setClipboardData({
             data: value,
             success() {
-                THAT.showToast("复制成功", "success");
-                typeof success === "function" && success();
+                THAT.showToast("复制成功");
+                success && success();
             }
         });
         // #endif
@@ -113,16 +113,20 @@ export default class ModuleControl {
         if (!clipboard) {
             clipboard = document.createElement("textarea");
             clipboard.id = id;
+            clipboard.readOnly = true;
             clipboard.style.cssText = "font-size: 15px; position: fixed; top: -1000%; left: -1000%;";
             document.body.appendChild(clipboard);
         }
         clipboard.value = value;
         clipboard.select();
         clipboard.setSelectionRange(0, clipboard.value.length);
-        document.execCommand("copy");
-        clipboard.blur();
-        typeof success === "function" && success();
-        this.showToast("复制成功", "success");
+        const state = document.execCommand("copy");
+        if (state) {
+          this.showToast("复制成功");
+          success && success();
+        } else {
+          this.showToast("复制失败");
+        }
         // #endif
     }
     

@@ -1,29 +1,48 @@
 <template>
     <view class="home">
-        <view class="list-item" v-for="item in list" :key="item.id">
+        <view class="list-item" v-for="item in loadMoreData.list" :key="item.id">
             <BookItem bookType="1" :bookData="item" />
-        </view>   
+        </view>
+        <view style="height: 30vh" v-if="loadMoreData.list.length === 0"></view>
+        <LoadMoreTip :info="loadMoreData" />
     </view>    
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
 import BookItem from "../../components/BookItem.vue"
-import {
-    createBookListData
-} from "../../utils/createBookData"
+import LoadMoreTip from "../../components/LoadMoreTip.vue";
+import LoadMore from "../../mixins/LoadMore";
+import { getBookList } from "../../api/common";
+import { ApiListData } from "../../utils/interfaces";
 
 @Component({
     components: {
-        BookItem
+        BookItem,
+        LoadMoreTip
     }
 })
-export default class HomePage extends Vue {
+export default class HomePage extends LoadMore {
 
-    private list = createBookListData(0, 0);
+    getListCallback(res: ApiListData) {
+        console.log("小说列表数据 >>", res);
+    }
+
+    requestList() {
+        return getBookList({
+            pageIndex: this.loadMoreData.pageIndex,
+            pageSize: this.loadMoreData.pageSize
+        })
+    }
+
+    onPullDownRefresh() {
+        this.refreshData(() => {
+            uni.stopPullDownRefresh();
+        });
+    }
 
     onLoad() {
-        this.list = createBookListData();
+        this.getListData();
     }
 }
 </script>

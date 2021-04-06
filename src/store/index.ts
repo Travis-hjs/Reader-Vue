@@ -1,35 +1,34 @@
 import ModuleAppOption from "./AppOption";
+import utils from "../utils";
 import { 
     DeepPartial,
+    DeepReadonly,
     UserInfoType 
 } from "../utils/interfaces";
 
 const cacheName = "user-info";
 
-export class StoreUserInfo extends ModuleAppOption {
-    
+export class ModuleStore extends ModuleAppOption {
     constructor() {
-        super()
-        this.initBookOption()
+        super();
+        this.initUserInfo();
+        this.initBookOption();
     }
 
-    readonly icon = {
-        /** 微信logo */
-        logo_wx: "/static/logo_wx.png",
-        /** 支付宝logo */
-        logo_zfb: "/static/logo_zfb.png",
-    }
-
-    readonly images = {
-        logo: "/static/logo.png",
-        /** 默认头像 */
-        default_head: "/static/default_head.png",
-        /** 暂无数据 */
-        none_data: "/static/none_data.png",
+    /** 图片对象集 */
+    get imageInfo() {
+        // 需要用作背景图的可以用`require`引入
+        return {
+            iconWx: "/static/logo_wx.png",
+            iconZfb: "/static/logo_zfb.png",
+            logo: "/static/logo.png",
+            defaultHead: "/static/default_head.png",
+            noneData: "/static/none_data.png",
+        }
     }
 
     /** 用户信息 */
-    readonly userInfo: UserInfoType = {
+    readonly userInfo: DeepReadonly<UserInfoType> = {
         id: "",
         token: "",
         phone: ""
@@ -40,12 +39,12 @@ export class StoreUserInfo extends ModuleAppOption {
      * @param value 
      */
     updateUserInfo(value: DeepPartial<UserInfoType>) {
-        this.modifyData(this.userInfo, value);
+        utils.modifyData(this.userInfo, value);
         uni.setStorageSync(cacheName, JSON.stringify(this.userInfo));
     }
 
     /** 初始化用户数据（从本地获取） */
-    initUserInfo() {
+    private initUserInfo() {
         const data = uni.getStorageSync(cacheName);
         if (data) {
             this.updateUserInfo(JSON.parse(data));
@@ -82,7 +81,7 @@ export class StoreUserInfo extends ModuleAppOption {
     private initBookOption() {
         const data = uni.getStorageSync("book-app-option");
         if (data) {
-            this.modifyData(this.bookOption, JSON.parse(data))
+            utils.modifyData(this.bookOption, JSON.parse(data))
         }
     }
 
@@ -94,6 +93,6 @@ export class StoreUserInfo extends ModuleAppOption {
 }
 
 /** 状态模块 */
-const store = new StoreUserInfo();
+const store = new ModuleStore();
 
 export default store;

@@ -3,6 +3,16 @@ export type DeepPartial<T> = {
     [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 }
 
+/** 深层递归所有属性为只读 */
+export type DeepReadonly<T> = {
+    readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
+}
+
+/** 深层递归所有属性为必选选（貌似不生效） */
+export type DeepRequired<T> = {
+    [P in keyof T]-?: T[P] extends object ? Required<T[P]> : T[P]
+}
+
 /** 运算符号 */
 export type NumberSymbols = "+" | "-"| "*" | "/";
 
@@ -19,7 +29,7 @@ export interface ShowConfirmOptions {
     /** 取消回调 */
     cancel?(): void 
     /** 确认按钮文字 */
-    text: string
+    text?: string
 }
 
 export interface RequestParams {
@@ -29,10 +39,12 @@ export interface RequestParams {
     path: string
     /** 传参对象 */
     data: any
+    /** 设置请求的 header，header 中不能设置 Referer。 */
+    headers: { [key: string]: string },
     /** 请求成功回调 */
-    success?(res: any): void
+    success?(res: ApiResult): void
     /** 请求失败回调 */
-    fail?(res: any): void
+    fail?(res: ApiResult): void
 }
 
 /** 上传图片返回结果 */
@@ -55,7 +67,7 @@ export interface UserInfoType {
 /** 接口请求基础响应数据 */
 export interface ApiResult {
     /** 接口状态（1为成功） */
-    state: 0|1|2|3
+    code: number
     /** 接口响应数据 */
     data: any
     /** 接口响应信息 */
@@ -70,7 +82,7 @@ export interface ApiListData extends ApiResult {
         /** 每页条数 */
         pageSize: number
         /** 列表数据 */
-        data: Array<any>
+        list: Array<any>
     }
 }
 
@@ -89,4 +101,9 @@ export interface LoadMoreType extends ListParams {
     state: "wait" | "loading" | "nomore"
     /** 加载的列表数据 */
     list: Array<any>
+    /**
+     * 请求成功次数
+     * @description 成功时才会累加，`requestCount === 1` 时为首次获取数据 
+    */
+    requestCount: number
 }

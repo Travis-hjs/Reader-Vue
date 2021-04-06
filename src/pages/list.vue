@@ -6,14 +6,14 @@
             <view class="value">{{ item.value }}</view>
         </view>
         <view style="height: 30vh" v-if="loadMoreData.list.length === 0"></view>
-        <LoadMoreTip :state="loadMoreData.state" />
+        <LoadMoreTip :info="loadMoreData" />
     </view>
 </template>
 <script lang="ts">
-import { Component, Mixins } from "vue-property-decorator";
-import LoadMore from "../mixins/LoadMore";
+import { Component } from "vue-property-decorator";
 import LoadMoreTip from "../components/LoadMoreTip.vue";
-import api from "../api";
+import LoadMore from "../mixins/LoadMore";
+import { getTestList } from "../api/common";
 import { ApiListData } from "../utils/interfaces";
 
 @Component({
@@ -28,7 +28,7 @@ export default class LoadMoreList extends LoadMore {
     }
 
     requestList() {
-        return api.getTestList({
+        return getTestList({
             pageIndex: this.loadMoreData.pageIndex,
             pageSize: this.loadMoreData.pageSize
         })
@@ -41,13 +41,13 @@ export default class LoadMoreList extends LoadMore {
      * - 当处理完数据刷新后，`uni.stopPullDownRefresh` 可以停止当前页面的下拉刷新。
      */
     onPullDownRefresh() {
-        this.resetListData();
-        this.getListData(() => {
+        this.refreshData(() => {
             uni.stopPullDownRefresh();
         });
     }
 
     onLoad() {
+        // 页面一开始用 getListData 和 refreshData都是一样的，因为变量一开始都一样
         this.getListData();
     }
 }

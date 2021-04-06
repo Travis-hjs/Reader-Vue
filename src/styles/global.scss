@@ -11,12 +11,6 @@ input::after, input::before, button::after, button::before{ border: none; }
 uni-page-body{ min-height: auto !important; }
 /* #endif */
 
-/* iphoneX 吸底适配（前提是用了定位）*/
-.iphonex_bottom{ bottom: 36rpx !important; }
-.iphonex_bottom::before{ content: ""; position: absolute; bottom: 0; left: 0; transform: translateY(100%); width: 100%; height: 36rpx; background-color: #181818; z-index: 10; }
-/* iphoneX 吸底适配（底部占位容器）*/
-.iphonex_bottom_view{ width: 100%; height: 36rpx; }
-
 /* flex布局 */
 .flex{ @include flex(); }
 .f1{ flex: 1; }
