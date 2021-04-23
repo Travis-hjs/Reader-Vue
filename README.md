@@ -16,20 +16,12 @@ set sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
 npm install
 ```
 
-### 运行项目
+### 运行项目，APP 中连接手机调试需要借助 HbuildX
 ```
 npm run serve
 ```
 
-### 打包项目，这边建议用官方 HBuildX IDE 去打包
+### 打包项目
 ```
 npm run build
 ```
-
-### 在 HBuildX 控制台中出现版本更新提示需要手动升级一下项目
-```
-npm update
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/)
