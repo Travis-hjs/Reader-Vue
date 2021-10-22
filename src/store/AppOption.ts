@@ -36,8 +36,8 @@ export default class ModuleAppOption {
     initAppOption() {
         const systemInfo = uni.getSystemInfoSync();
         
-        this.appOption.statusBarHeight = systemInfo.statusBarHeight;
-        this.appOption.tabBarHeight = systemInfo.screenHeight - systemInfo.windowHeight - systemInfo.statusBarHeight;
+        this.appOption.statusBarHeight = systemInfo.statusBarHeight!;
+        this.appOption.tabBarHeight = systemInfo.screenHeight - systemInfo.windowHeight - systemInfo.statusBarHeight!;
         this.appOption.windowHeight = systemInfo.windowHeight;
         this.appOption.windowWidth = systemInfo.windowWidth;
         this.appOption.screenWidth = systemInfo.screenWidth
@@ -55,9 +55,9 @@ export default class ModuleAppOption {
         // #ifdef MP
         const menuButtonInfo = uni.getMenuButtonBoundingClientRect();
         // 导航栏高度 = 状态栏到胶囊的间距（胶囊距上距离-状态栏高度） * 2 + 胶囊高度 + 状态栏高度
-        this.appOption.navBarHeight = (menuButtonInfo.top - systemInfo.statusBarHeight) * 2 + menuButtonInfo.height + systemInfo.statusBarHeight;
+        this.appOption.navBarHeight = (menuButtonInfo.top - systemInfo.statusBarHeight!) * 2 + menuButtonInfo.height + systemInfo.statusBarHeight!;
         this.appOption.menuRight = systemInfo.screenWidth - menuButtonInfo.right;
-        this.appOption.menuBottom = menuButtonInfo.top - systemInfo.statusBarHeight;
+        this.appOption.menuBottom = menuButtonInfo.top - systemInfo.statusBarHeight!;
         this.appOption.menuHeight = menuButtonInfo.height;
         this.appOption.menuWidth = menuButtonInfo.width;
         // #endif
