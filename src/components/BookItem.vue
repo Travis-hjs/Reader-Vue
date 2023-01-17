@@ -1,87 +1,78 @@
 <template>
-    <view class="book-item" @click="openDetails">
-        <!-- 一行 2 个布局 -->
-        <view class="book gird_2" v-if="bookType == '2'">
-            <image class="book_img" mode="aspectFill" :src="bookData.thumb" />
-            <view :class="['index', bookData.index < 3 ? 'index_on':'']">{{ bookData.index + 1 }}</view>
-            <view class="book_content">
-                <view class="book_title ellipsis-2">{{ bookData.name }}</view>
-                <view class="book_dec ellipsis-2">{{ bookData.info }}</view>
-            </view>
-        </view>
-
-        <!-- 一行 1 个布局-->
-        <view class="book gird_1" v-else-if="bookType == '1'">
-            <image class="book_img" mode="aspectFill" :src="bookData.thumb" />
-            <view class="book_content">
-                <view class="book_title_box">
-                    <view class="book_title ellipsis">{{ bookData.name }}</view>
-                    <view class="score">{{ bookData.score }} 分</view>
-                </view>
-                <view class="book_dec ellipsis">{{ bookData.info }}</view>
-                <view class="book_label ellipsis">{{ bookData.label }}</view>
-            </view>
-        </view>
-
-        <!-- 一行 4 个布局 -->
-        <view class="book gird_4" v-else-if="bookType == '4'">
-            <image class="book_img" mode="aspectFill" :src="bookData.thumb" />
-            <view class="book_title ellipsis-2">{{ bookData.name }}</view>
-            <view class="score">{{ bookData.score }} 分</view>
-        </view>
-
-        <!-- 榜单 item 布局 -->
-        <view class="book item_rank" v-else-if="bookType == 'rank'">
-            <view class="index">{{ bookData.index + 1 }}</view>
-            <image class="book_img" mode="aspectFill" :src="bookData.thumb" />
-            <view class="book_content">
-                <view class="book_title ellipsis-2">{{ bookData.name }}</view>
-                <view class="book_label ellipsis">{{ bookData.label }}</view>
-                <view class="book_dec ellipsis">{{ bookData.value }}</view>
-            </view>
-        </view>
-
+  <view class="book-item" @click="openDetails">
+    <!-- 一行 2 个布局 -->
+    <view class="book gird_2" v-if="bookType == '2'">
+      <image class="book_img" mode="aspectFill" :src="bookData.thumb" />
+      <view :class="['index', bookData.index < 3 ? 'index_on' : '']">{{ bookData.index + 1 }}</view>
+      <view class="book_content">
+        <view class="book_title ellipsis-2">{{ bookData.name }}</view>
+        <view class="book_dec ellipsis-2">{{ bookData.info }}</view>
+      </view>
     </view>
+
+    <!-- 一行 1 个布局-->
+    <view class="book gird_1" v-else-if="bookType == '1'">
+      <image class="book_img" mode="aspectFill" :src="bookData.thumb" />
+      <view class="book_content">
+        <view class="book_title_box">
+          <view class="book_title ellipsis">{{ bookData.name }}</view>
+          <view class="score">{{ bookData.score }} 分</view>
+        </view>
+        <view class="book_dec ellipsis">{{ bookData.info }}</view>
+        <view class="book_label ellipsis">{{ bookData.label }}</view>
+      </view>
+    </view>
+
+    <!-- 一行 4 个布局 -->
+    <view class="book gird_4" v-else-if="bookType == '4'">
+      <image class="book_img" mode="aspectFill" :src="bookData.thumb" />
+      <view class="book_title ellipsis-2">{{ bookData.name }}</view>
+      <view class="score">{{ bookData.score }} 分</view>
+    </view>
+
+    <!-- 榜单 item 布局 -->
+    <view class="book item_rank" v-else-if="bookType == 'rank'">
+      <view class="index">{{ bookData.index + 1 }}</view>
+      <image class="book_img" mode="aspectFill" :src="bookData.thumb" />
+      <view class="book_content">
+        <view class="book_title ellipsis-2">{{ bookData.name }}</view>
+        <view class="book_label ellipsis">{{ bookData.label }}</view>
+        <view class="book_dec ellipsis">{{ bookData.value }}</view>
+      </view>
+    </view>
+
+  </view>
 </template>
+<script lang="ts" setup>
+import { PropType } from "vue";
+import { showToast } from "@/utils/control";
+import { BookInfo, createBookInfo } from "@/hooks/book";
 
-<script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import utils from "../utils";
-import {
-    createBookInfo,
-    BookInfo
-} from "../utils/createBookData";
-
-@Component({})
-export default class BookItem extends Vue {
-    @Prop({
-        type: String,
-        default: "0"
-    })
-    bookType!: "1"|"2"|"3"|"4"|"rank";
-
-    @Prop({
-        type: Object,
-        default() {
-            return createBookInfo();
-        }
-    })
-    bookData!: BookInfo
-
-    /**
-     * 跳转详情
-    */
-    openDetails() {
-        utils.showToast("小说id " + this.bookData.id)
-        uni.navigateTo({
-            url: "/pages/book?id=" + this.bookData.id
-        });
+const props = defineProps({
+  bookType: {
+    type: String as PropType<"1"|"2"|"3"|"4"|"rank">,
+    default: "0"
+  },
+  bookData: {
+    type: Object as PropType<BookInfo>,
+    default() {
+        return createBookInfo();
     }
+  }
+});
+
+/**
+ * 跳转详情
+ */
+function openDetails() {
+  showToast("小说id " + props.bookData.id)
+  uni.navigateTo({
+    url: "/pages/book?id=" + props.bookData.id
+  });
 }
 </script>
-
 <style lang="scss" scoped>
-image{ will-change: transform }
+image { will-change: transform }
 .book-item {
     width: 100%;height: 100%;
     .book{ width: 100%; }

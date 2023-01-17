@@ -1,0 +1,85 @@
+@import "../uni.scss";
+
+@mixin reset { margin: 0; padding: 0; box-sizing: border-box; }
+
+page { background-color: #fff; width: 100%; min-height: 100vh; @include reset(); }
+view, button, input, textarea { font-family: "Arial", "Helvetica Neue", "Helvetica", "sans-serif"; @include reset(); }
+image, input, textarea, picker { display: block; width: 100%; @include reset();}
+input::after, input::before, button::after, button::before { border: none; @include reset(); }
+
+// h5默认是100vh,即使页面没有内容也会滚动，这里取消这个设定
+// 注意：scss 条件编译必须以 css 注释为标准才能条件编译
+/* #ifdef H5 */
+uni-page-body { min-height: auto !important; }
+/* #endif */
+
+/* flex布局 */
+.flex { display: flex; flex-wrap: nowrap; }
+.fwrap { display: flex; flex-wrap: wrap; }
+.f1 { flex: 1; }
+.f2 { flex: 2; }
+.f3 { flex: 3; }
+/* 垂直居中 */
+.fvertical { display: flex; align-items: center; }
+/* 水平居中 */
+.fcenter { display: flex; justify-content: center; }
+/* 水平+垂直居中 */
+.fvc { display: flex; align-items: center; justify-content: center; }
+/* 右对齐 */
+.fright { display: flex; justify-content: flex-end; }
+/* 两端对齐 */
+.fbetween { display: flex; justify-content: space-between; }
+/* 靠底部对齐 */
+.fbottom { display: flex; align-items: flex-end; }
+
+/* 溢出...显示 当前节点生效 */
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 溢出...显示 子节点生效 */
+.ellipsis_1 { @include ellipsis(1); }
+.ellipsis_2 { @include ellipsis(2); }
+.ellipsis_3 { @include ellipsis(3); }
+
+/* 卡片 */
+.card { 
+  border-radius: 2px; 
+  box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12); 
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.button { @include button($dark, #eee); }
+.button-dark { @include button(#e3b480, $dark); }
+.button-pink {  @include button($white, $pink); }
+.button-red { @include button($white, $red); }
+
+.line { width: 100%; padding-top: 40rpx; margin-bottom: 40rpx; border-bottom: solid 1px #eee; }
+
+/* 上下左右边距 */
+@for $index from 1 through 5 {
+  .mgl_#{$index}0 {
+    margin-left: 10rpx * $index;
+  }
+  .mgr_#{$index}0 {
+    margin-right: 10rpx * $index;
+  }
+  .mgt_#{$index}0 {
+    margin-top: 10rpx * $index;
+  }
+  .mgb_#{$index}0 {
+    margin-bottom: 10rpx * $index;
+  }
+  .pdl_#{$index}0 {
+    padding-left: 10rpx * $index;
+  }
+  .pdr_#{$index}0 {
+    padding-right: 10rpx * $index;
+  }
+  .pdt_#{$index}0 {
+    padding-top: 10rpx * $index;
+  }
+  .pdb_#{$index}0 {
+    padding-bottom: 10rpx * $index;
+  }
+}
+  

@@ -1,32 +1,33 @@
-export class ModuleConfig {
-    constructor() {
-        this.env = process.env.NODE_ENV === "development" ? "dev" : "prod";
-    }
+function moduleConfig() {
 
-    /** 当前开发环境 */
-    readonly env!: "dev" | "prod"
+  const env = process.env.NODE_ENV === "development" ? "dev" : "prod";
 
+  const url = {
+    dev: `/api`,
+    prod: "https://huangjingsheng.com/api"
+  }
+
+  return {
     /** 请求超时毫秒 */
-    readonly requestOvertime = 8000;
-
-    /** 开发环境 */
-    protected readonly dev = {
-        api: "http://192.168.89.53/api",
-    }
-    
-    /** 生产环境 */
-    protected readonly prod = {
-        api: "https://huangjingsheng.com/api"
-    }
-
+    get requestOvertime() {
+      return 8000;
+    },
     /** `api`请求域名 */
     get apiUrl() {
-        return this[this.env].api;
+      return url[env];
+    },
+    /** 当前环境模式 */
+    get env() {
+      return env;
+    },
+    /** 上传图片地址 */
+    get uploadUrl() {
+      return "http://xxx.com/upload"
     }
+  }
 }
 
 /** 配置模块 */
-const config = new ModuleConfig();
+const config = moduleConfig();
 
 export default config;
-

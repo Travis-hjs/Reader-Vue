@@ -1,4 +1,50 @@
 // 每个页面需要引入的文件，注意：vue.config.js 中配置的 css.loaderOptions 是无法在当前项目生效的，
 // 可能是uni-app项目设定和标准vue-cli项目设定不一样导致的，需要在当前文件全局引入即可
-@import "./styles/variable.scss";
-@import "./styles/mixins.scss";
+// 全局样式写在`App.vue`里面，一些预处理工具样式可以写这里，因为每个页面都会注入一遍
+// 全局样式不写在这里的原因是因为每个页面都注入一遍的话会导致`html-style`有多个相同的代码标签
+
+$white: #fff;
+$black: #010101;
+$dark: #222;
+$red: #fa2d2d;
+$pink: #f04e7d;
+$blue: #2C72F3;
+
+// 溢出...显示
+@mixin ellipsis($number) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $number;
+  overflow: hidden;
+}
+
+@mixin button($color, $bg) {
+  font-size: 30rpx;
+  min-width: 160rpx;
+  padding: 0 20rpx;
+  border-radius: 2px;
+  height: 80rpx;
+  background-color: $bg;
+  border-color: $bg;
+  color: $color;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after,
+  &::before {
+    border: none;
+    background-color: transparent;
+  }
+
+  &:hover {
+    background-color: $bg;
+    border-color: $bg;
+    color: $color;
+  }
+
+  &:active {
+    opacity: 0.85;
+  }
+}

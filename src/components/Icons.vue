@@ -1,56 +1,46 @@
 <template>
 	<text :style="{ color: color, 'font-size': size + 'px' }" class="uni-icons" @click="theClick">{{ icons[type] }}</text>
 </template>
-
-<script>
-import iconData from "../utils/icon";
+<script lang="ts">
+import iconData from "@/utils/icon";
+import { PropType } from "vue";
 
 // learn: https://uniapp.dcloud.io/extendUI?id=icon-%e5%9b%be%e6%a0%87
 
 // #ifdef APP-NVUE
 const domModule = weex.requireModule('dom');
 domModule.addRule('fontFace', {
-    'fontFamily': "uniicons",
-    'src': `url('${iconData.font}')`
+  'fontFamily': "uniicons",
+  'src': `url('${iconData.font}')`
 });
 // #endif
+</script>
+<script lang="ts" setup>
+const icons = iconData.icons;
 
-/**
- * Icons 图标
- * @description 用于展示 icons 图标
- * @tutorial https://ext.dcloud.net.cn/plugin?id=28
- * @property {Number} size 图标大小
- * @property {String} type 图标图案，参考示例
- * @property {String} color 图标颜色
- * @event {Function} click 点击 Icon 触发事件
- */
-export default {
-    name: 'UniIcons',
-    props: {
-        type: {
-            type: String,
-            default: ''
-        },
-        color: {
-            type: String,
-            default: '#333333'
-        },
-        size: {
-            type: [Number, String],
-            default: 16
-        }
-    },
-    data() {
-        return {
-            icons: iconData.icons
-        }
-    },
-    methods: {
-        theClick() {
-            this.$emit('click')
-        }
-    }
+defineProps({
+  type: {
+    type: String as PropType<keyof typeof icons>,
+    default: ""
+  },
+  color: {
+    type: String,
+    default: "#333333"
+  },
+  size: {
+    type: [Number, String],
+    default: 16
+  }
+});
+
+const emit = defineEmits<{
+  (e: "click"): void
+}>();
+
+function theClick() {
+  emit("click");
 }
+
 </script>
 
 <style scoped>
